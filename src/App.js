@@ -1,45 +1,33 @@
 import React from "react";
 
-class Counter extends React.Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      count: 5,
-    };
-
-    this.handleDecrement = this.handleDecrement.bind(this);
-    this.handleIncrement = this.handleIncrement.bind(this);
+    this.state = { localStorage: "Lisbon" };
+    this.fetchWeather = this.fetchWeather.bind(this);
   }
 
-  handleDecrement() {
-    // this.setState({
-    //   count: this.state.count - 1
-    // });
-    this.setState(curState => {
-      return { count: curState.count - 1 }
-    });
-  }
-  
-  handleIncrement() {
-    this.setState(curState => {
-      return { count: curState.count + 1 }
-    });
+  fetchWeather() {
+    console.log('Loading data...');
+    console.log(this);
   }
 
   render() {
-    // the "this" here will point to the current component instance
-    const date = new Date('june 21 2027')
-    date.setDate(date.getDate() + this.state.count)
-    
     return (
-      <div className="counter">
-        <button onClick={this.handleDecrement}>-</button>
-        <span>{date.toDateString()} [{this.state.count}]</span>
-        <button onClick={this.handleIncrement}>+</button>
+      <div className="app">
+        <h1 className="App-header">Classy Weather</h1>
+        <div className="App-title">
+          <input
+            type="text"
+            placeholder="Search from location..."
+            value={this.state.localStorage}
+            onChange={e => this.setState({ localStorage: e.target.value })}
+          />
+        </div>
+        <button onClick={this.fetchWeather}>Get weather</button>
       </div>
     );
   }
 }
 
-export default Counter;
+export default App;
