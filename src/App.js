@@ -60,9 +60,9 @@ class App extends React.Component {
       const { latitude, longitude, timezone, name, country_code } =
         geoData.results.at(0);
 
-        this.setState({
-          displayLocation: `${name} ${convertToFlag(country_code)}`,
-        });
+      this.setState({
+        displayLocation: `${name} ${convertToFlag(country_code)}`,
+      });
 
       // 2) Getting actual weather
       const weatherRes = await fetch(
@@ -71,7 +71,7 @@ class App extends React.Component {
       const weatherData = await weatherRes.json();
       this.setState({ weather: weatherData.daily });
     } catch (err) {
-      console.error(err);
+      console.err(err);
     } finally {
       this.setState({ isLoading: false });
     }
@@ -80,21 +80,73 @@ class App extends React.Component {
   render() {
     return (
       <div className="app">
-        <h1 className="App-header">Classy Weather</h1>
-        <div className="App-title">
+        <h1>Classy Weather</h1>
+        <div>
           <input
             type="text"
             placeholder="Search from location..."
-            value={this.state.localStorage}
-            onChange={(e) => this.setState({ localStorage: e.target.value })}
+            value={this.state.location}
+            onChange={(e) => this.setState({ location: e.target.value })}
           />
         </div>
         <button onClick={this.fetchWeather}>Get weather</button>
 
-        {this.state.isLoading && <p className="Loader">Loading...</p>}
+        {this.state.isLoading && <p className="loader">Loading...</p>}
+
+        {this.state.weather.weathercode && (
+          <Weather
+            weather={this.state.weather}
+            location={this.state.displayLocation}
+          />
+        )}
       </div>
     );
   }
 }
 
 export default App;
+
+class Weather extends React.Component {
+  render() {
+    const {
+      temperature_2m_max: max,
+      temperature_2m_min: min,
+      time: dates,
+      weathercode: codes,
+    } = this.props.weather;
+
+    return (
+      <div>
+        <h2>Weather {this.props.location}</h2>
+        <ul className="weather">
+          {dates.map((date, i) => (
+            <Day
+              date={date}
+              max={max.at(i)}
+              min={min.at(i)}
+              code={codes.at(i)}
+              key={date}
+              isToday={i === 0}
+            />
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+
+class Day extends React.Component {
+  render() {
+    const { date, max, min, code, isToday } = this.props;
+
+    return (
+      <li className="day">
+        <span>{getWeatherIcon(code)}</span>
+        <p>{isToday ? "Today" : formatDay(date)}</p>
+        <p>
+          {Math.floor(min)}&deg; &mdash; <strong>{Math.ceil(max)}&deg;</strong>
+        </p>
+      </li>
+    );
+  }
+}
